@@ -42,7 +42,7 @@ public class SnapshotGenerator
         return snapshot;
     }
 
-    public async Task SaveSnapshotAsync(SprintSnapshot snapshot, string? customFilename = null)
+    public async System.Threading.Tasks.Task SaveSnapshotAsync(SprintSnapshot snapshot, string? customFilename = null)
     {
         var outputDir = _settings.OutputSettings.OutputDirectory;
         Directory.CreateDirectory(outputDir);
@@ -68,7 +68,7 @@ public class SnapshotGenerator
         }
     }
 
-    private async Task UpdateSnapshotsIndexAsync(string newSnapshot)
+    private async System.Threading.Tasks.Task UpdateSnapshotsIndexAsync(string newSnapshot)
     {
         var outputDir = _settings.OutputSettings.OutputDirectory;
         var indexPath = Path.Combine(outputDir, "snapshots.json");

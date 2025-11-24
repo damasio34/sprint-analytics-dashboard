@@ -1,7 +1,7 @@
 using JiraSnapshotGenerator.Models;
 using JiraSnapshotGenerator.Services;
 using Microsoft.Extensions.Configuration;
-using Spectre.Console;
+using Serilog;
 
 namespace JiraSnapshotGenerator;
 
@@ -9,24 +9,27 @@ class Program
 {
     static async Task<int> Main(string[] args)
     {
+        // Configurar Serilog
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.Console()
+            .WriteTo.File("logs/jira-snapshot-.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
         try
         {
-            AnsiConsole.Write(
-                new FigletText("Jira Snapshot")
-                    .LeftJustified()
-                    .Color(Color.Blue));
-
-            AnsiConsole.MarkupLine("[blue]Dashboard BI - Gerador de Snapshots do Jira[/]");
-            AnsiConsole.MarkupLine("[grey]Versão 1.0.0[/]");
-            AnsiConsole.WriteLine();
+            Log.Information("=== Jira Snapshot Generator ===");
+            Log.Information("Dashboard BI - Gerador de Snapshots do Jira");
+            Log.Information("Versão 1.0.0");
+            Console.WriteLine();
 
             // Carregar configurações
             var settings = LoadSettings();
 
             if (settings == null)
             {
-                AnsiConsole.MarkupLine("[red]❌ Erro ao carregar configurações![/]");
-                AnsiConsole.MarkupLine("[yellow]⚠️  Verifique se o arquivo appsettings.json existe.[/]");
+                Log.Error("❌ Erro ao carregar configurações!");
+                Log.Warning("⚠️  Verifique se o arquivo appsettings.json existe.");
                 return 1;
             }
 
@@ -39,50 +42,57 @@ class Program
             // Menu principal
             while (true)
             {
-                var choice = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>()
-                        .Title("[green]O que você deseja fazer?[/]")
-                        .AddChoices(
-                            "🚀 Gerar snapshot com configurações padrão",
-                            "🔧 Gerar snapshot com JQL customizado",
-                            "⚙️  Mostrar configurações atuais",
-                            "📚 Ajuda",
-                            "❌ Sair"
-                        ));
+                Console.WriteLine("O que você deseja fazer?");
+                Console.WriteLine("1. 🚀 Gerar snapshot com configurações padrão");
+                Console.WriteLine("2. 🔧 Gerar snapshot com JQL customizado");
+                Console.WriteLine("3. ⚙️  Mostrar configurações atuais");
+                Console.WriteLine("4. 📚 Ajuda");
+                Console.WriteLine("5. ❌ Sair");
+                Console.Write("Digite sua escolha (1-5): ");
+
+                var choice = Console.ReadLine();
 
                 switch (choice)
                 {
-                    case "🚀 Gerar snapshot com configurações padrão":
+                    case "1":
                         await GenerateDefaultSnapshot(settings);
                         break;
 
-                    case "🔧 Gerar snapshot com JQL customizado":
+                    case "2":
                         await GenerateCustomSnapshot(settings);
                         break;
 
-                    case "⚙️  Mostrar configurações atuais":
+                    case "3":
                         ShowCurrentSettings(settings);
                         break;
 
-                    case "📚 Ajuda":
+                    case "4":
                         ShowHelp();
                         break;
 
-                    case "❌ Sair":
-                        AnsiConsole.MarkupLine("[blue]👋 Até logo![/]");
+                    case "5":
+                        Log.Information("👋 Até logo!");
                         return 0;
+
+                    default:
+                        Log.Warning("Opção inválida. Digite um número de 1 a 5.");
+                        break;
                 }
 
-                AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[grey]Pressione qualquer tecla para continuar...[/]");
+                Console.WriteLine();
+                Console.WriteLine("Pressione qualquer tecla para continuar...");
                 Console.ReadKey(true);
                 Console.Clear();
             }
         }
         catch (Exception ex)
         {
-            AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
+            Log.Fatal(ex, "Erro fatal na aplicação");
             return 1;
+        }
+        finally
+        {
+            Log.CloseAndFlush();
         }
     }
 
@@ -102,7 +112,7 @@ class Program
         }
         catch (Exception ex)
         {
-            AnsiConsole.MarkupLine($"[red]Erro ao carregar configurações: {ex.Message}[/]");
+            Log.Error(ex, "Erro ao carregar configurações: {ErrorMessage}", ex.Message);
             return null;
         }
     }
@@ -123,15 +133,15 @@ class Program
         if (settings.TeamSettings.Members.Count == 0)
             errors.Add("Nenhum membro do time configurado");
 
-        if (errors.Any())
+        if (errors.Count > 0)
         {
-            AnsiConsole.MarkupLine("[red]❌ Configurações inválidas:[/]");
+            Log.Error("❌ Configurações inválidas:");
             foreach (var error in errors)
             {
-                AnsiConsole.MarkupLine($"[yellow]   • {error}[/]");
+                Log.Warning("   • {Error}", error);
             }
-            AnsiConsole.WriteLine();
-            AnsiConsole.MarkupLine("[blue]💡 Edite o arquivo appsettings.json com suas configurações.[/]");
+            Console.WriteLine();
+            Log.Information("💡 Edite o arquivo appsettings.json com suas configurações.");
             return false;
         }
 
@@ -140,74 +150,77 @@ class Program
 
     static async Task GenerateDefaultSnapshot(AppSettings settings)
     {
-        AnsiConsole.Clear();
-        AnsiConsole.Rule("[blue]Gerar Snapshot Padrão[/]");
-        AnsiConsole.WriteLine();
+        Console.Clear();
+        Log.Information("=== Gerar Snapshot Padrão ===");
+        Console.WriteLine();
 
         var generator = new SnapshotGenerator(settings);
 
         try
         {
-            var snapshot = await AnsiConsole.Status()
-                .Spinner(Spinner.Known.Dots)
-                .StartAsync("Gerando snapshot...", async ctx =>
-                {
-                    return await generator.GenerateSnapshotAsync();
-                });
+            Log.Information("Gerando snapshot...");
+            var snapshot = await generator.GenerateSnapshotAsync();
 
             generator.PrintSummary(snapshot);
 
-            var shouldSave = AnsiConsole.Confirm("💾 Deseja salvar este snapshot?", true);
+            Console.Write("💾 Deseja salvar este snapshot? (S/n): ");
+            var response = Console.ReadLine();
+            var shouldSave = string.IsNullOrWhiteSpace(response) || response.ToUpper().StartsWith("S");
 
             if (shouldSave)
             {
                 await generator.SaveSnapshotAsync(snapshot);
-                
-                AnsiConsole.MarkupLine("[green]✅ Snapshot salvo com sucesso![/]");
-                AnsiConsole.WriteLine();
-                AnsiConsole.MarkupLine("[blue]📋 Próximos passos:[/]");
-                AnsiConsole.MarkupLine($"   1. Copie os arquivos da pasta [yellow]{settings.OutputSettings.OutputDirectory}[/]");
-                AnsiConsole.MarkupLine("   2. Cole na pasta [yellow]data/[/] do dashboard");
-                AnsiConsole.MarkupLine("   3. Recarregue o dashboard no navegador");
+
+                Log.Information("✅ Snapshot salvo com sucesso!");
+                Console.WriteLine();
+                Log.Information("📋 Próximos passos:");
+                Log.Information("   1. Copie os arquivos da pasta {OutputDirectory}", settings.OutputSettings.OutputDirectory);
+                Log.Information("   2. Cole na pasta data/ do dashboard");
+                Log.Information("   3. Recarregue o dashboard no navegador");
             }
         }
         catch (HttpRequestException ex)
         {
-            AnsiConsole.MarkupLine($"[red]❌ Erro de conexão com o Jira:[/]");
-            AnsiConsole.MarkupLine($"[yellow]{ex.Message}[/]");
-            AnsiConsole.WriteLine();
-            AnsiConsole.MarkupLine("[blue]💡 Verifique:[/]");
-            AnsiConsole.MarkupLine("   • Se a URL do Jira está correta");
-            AnsiConsole.MarkupLine("   • Se suas credenciais estão corretas");
-            AnsiConsole.MarkupLine("   • Se você tem acesso à rede/VPN");
+            Log.Error("❌ Erro de conexão com o Jira:");
+            Log.Error(ex.Message);
+            Console.WriteLine();
+            Log.Information("💡 Verifique:");
+            Log.Information("   • Se a URL do Jira está correta");
+            Log.Information("   • Se suas credenciais estão corretas");
+            Log.Information("   • Se você tem acesso à rede/VPN");
         }
         catch (Exception ex)
         {
-            AnsiConsole.WriteException(ex);
+            Log.Error(ex, "Erro durante a geração do snapshot");
         }
     }
 
     static async Task GenerateCustomSnapshot(AppSettings settings)
     {
-        AnsiConsole.Clear();
-        AnsiConsole.Rule("[blue]Gerar Snapshot Customizado[/]");
-        AnsiConsole.WriteLine();
+        Console.Clear();
+        Log.Information("=== Gerar Snapshot Customizado ===");
+        Console.WriteLine();
 
-        AnsiConsole.MarkupLine("[yellow]Digite o JQL customizado:[/]");
-        AnsiConsole.MarkupLine("[grey]Exemplo: project=CROSS AND sprint=\"Sprint 1\" AND status=Done[/]");
-        AnsiConsole.WriteLine();
+        Log.Information("Digite o JQL customizado:");
+        Log.Information("Exemplo: project=CROSS AND sprint=\"Sprint 1\" AND status=Done");
+        Console.WriteLine();
 
-        var jql = AnsiConsole.Ask<string>("JQL:", settings.JiraSettings.DefaultJql);
+        Console.Write($"JQL ({settings.JiraSettings.DefaultJql}): ");
+        var jql = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(jql))
+            jql = settings.JiraSettings.DefaultJql;
 
-        AnsiConsole.WriteLine();
-        
-        var sprintName = AnsiConsole.Ask<string>(
-            "Nome da Sprint:", 
-            settings.SprintSettings.SprintName);
+        Console.WriteLine();
 
-        var sprintId = AnsiConsole.Ask<string>(
-            "ID do Snapshot (nome do arquivo):", 
-            settings.SprintSettings.SprintId);
+        Console.Write($"Nome da Sprint ({settings.SprintSettings.SprintName}): ");
+        var sprintName = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(sprintName))
+            sprintName = settings.SprintSettings.SprintName;
+
+        Console.Write($"ID do Snapshot ({settings.SprintSettings.SprintId}): ");
+        var sprintId = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(sprintId))
+            sprintId = settings.SprintSettings.SprintId;
 
         // Atualizar temporariamente as configurações
         settings.SprintSettings.SprintName = sprintName;
@@ -217,138 +230,117 @@ class Program
 
         try
         {
-            var snapshot = await AnsiConsole.Status()
-                .Spinner(Spinner.Known.Dots)
-                .StartAsync("Gerando snapshot...", async ctx =>
-                {
-                    return await generator.GenerateSnapshotAsync(jql);
-                });
+            Log.Information("Gerando snapshot...");
+            var snapshot = await generator.GenerateSnapshotAsync(jql);
 
             generator.PrintSummary(snapshot);
 
-            var shouldSave = AnsiConsole.Confirm("💾 Deseja salvar este snapshot?", true);
+            Console.Write("💾 Deseja salvar este snapshot? (S/n): ");
+            var response = Console.ReadLine();
+            var shouldSave = string.IsNullOrWhiteSpace(response) || response.ToUpper().StartsWith("S");
 
             if (shouldSave)
             {
                 var filename = $"{sprintId}.json";
                 await generator.SaveSnapshotAsync(snapshot, filename);
-                
-                AnsiConsole.MarkupLine("[green]✅ Snapshot salvo com sucesso![/]");
+
+                Log.Information("✅ Snapshot salvo com sucesso!");
             }
         }
         catch (HttpRequestException ex)
         {
-            AnsiConsole.MarkupLine($"[red]❌ Erro de conexão com o Jira:[/]");
-            AnsiConsole.MarkupLine($"[yellow]{ex.Message}[/]");
+            Log.Error("❌ Erro de conexão com o Jira:");
+            Log.Error(ex.Message);
         }
         catch (Exception ex)
         {
-            AnsiConsole.WriteException(ex);
+            Log.Error(ex, "Erro durante a geração do snapshot customizado");
         }
     }
 
     static void ShowCurrentSettings(AppSettings settings)
     {
-        AnsiConsole.Clear();
-        AnsiConsole.Rule("[blue]Configurações Atuais[/]");
-        AnsiConsole.WriteLine();
+        Console.Clear();
+        Log.Information("=== Configurações Atuais ===");
+        Console.WriteLine();
 
-        var table = new Table()
-            .Border(TableBorder.Rounded)
-            .AddColumn("[yellow]Configuração[/]")
-            .AddColumn("[green]Valor[/]");
+        Console.WriteLine("┌────────────────────────────────────────┬──────────────────────────────────────┐");
+        Console.WriteLine("│ Configuração                           │ Valor                                │");
+        Console.WriteLine("├────────────────────────────────────────┼──────────────────────────────────────┤");
+        Console.WriteLine($"│ 🔗 URL Jira                           │ {settings.JiraSettings.BaseUrl,-36} │");
+        Console.WriteLine($"│ 👤 Usuário                            │ {settings.JiraSettings.Username,-36} │");
+        Console.WriteLine($"│ 🔑 Senha/Token                        │ {new string('*', 20),-36} │");
+        Console.WriteLine($"│ 📁 Projeto                            │ {settings.JiraSettings.ProjectKey,-36} │");
+        Console.WriteLine($"│ 🏃 Sprint                             │ {settings.SprintSettings.SprintName,-36} │");
+        Console.WriteLine($"│ 📅 Período                            │ {$"{settings.SprintSettings.StartDate:yyyy-MM-dd} até {settings.SprintSettings.EndDate:yyyy-MM-dd}",-36} │");
+        Console.WriteLine($"│ 👥 Membros                            │ {settings.TeamSettings.Members.Count.ToString(),-36} │");
+        Console.WriteLine($"│ 💾 Output                             │ {settings.OutputSettings.OutputDirectory,-36} │");
+        Console.WriteLine("└────────────────────────────────────────┴──────────────────────────────────────┘");
+        Console.WriteLine();
 
-        table.AddRow("🔗 URL Jira", settings.JiraSettings.BaseUrl);
-        table.AddRow("👤 Usuário", settings.JiraSettings.Username);
-        table.AddRow("🔑 Senha/Token", new string('*', 20));
-        table.AddRow("📁 Projeto", settings.JiraSettings.ProjectKey);
-        table.AddRow("🏃 Sprint", settings.SprintSettings.SprintName);
-        table.AddRow("📅 Período", $"{settings.SprintSettings.StartDate:yyyy-MM-dd} até {settings.SprintSettings.EndDate:yyyy-MM-dd}");
-        table.AddRow("👥 Membros", settings.TeamSettings.Members.Count.ToString());
-        table.AddRow("💾 Output", settings.OutputSettings.OutputDirectory);
+        Log.Information("JQL Padrão:");
+        Console.WriteLine($"   {settings.JiraSettings.DefaultJql}");
+        Console.WriteLine();
 
-        AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
-
-        AnsiConsole.MarkupLine("[blue]JQL Padrão:[/]");
-        AnsiConsole.MarkupLine($"[grey]{settings.JiraSettings.DefaultJql}[/]");
-        AnsiConsole.WriteLine();
-
-        AnsiConsole.MarkupLine("[blue]Membros do Time:[/]");
+        Log.Information("Membros do Time:");
         foreach (var member in settings.TeamSettings.Members)
         {
-            AnsiConsole.MarkupLine($"   • [yellow]{member.Name}[/] ({member.Role}) - {member.Capacity}h - [grey]@{member.JiraUsername}[/]");
+            Console.WriteLine($"   • {member.Name} ({member.Role}) - {member.Capacity}h - @{member.JiraUsername}");
         }
     }
 
     static void ShowHelp()
     {
-        AnsiConsole.Clear();
-        AnsiConsole.Rule("[blue]Ajuda - Como Usar[/]");
-        AnsiConsole.WriteLine();
+        Console.Clear();
+        Log.Information("=== Ajuda - Como Usar ===");
+        Console.WriteLine();
 
-        var panel1 = new Panel(
-            "[yellow]1.[/] Configure suas credenciais do Jira no [blue]appsettings.json[/]\n" +
-            "[yellow]2.[/] Configure os membros do seu time\n" +
-            "[yellow]3.[/] Ajuste o JQL padrão conforme sua necessidade\n" +
-            "[yellow]4.[/] Execute o programa e escolha uma opção")
-        {
-            Header = new PanelHeader("🚀 Primeiros Passos"),
-            Border = BoxBorder.Rounded
-        };
-        AnsiConsole.Write(panel1);
-        AnsiConsole.WriteLine();
+        Console.WriteLine("🚀 Primeiros Passos");
+        Console.WriteLine("──────────────────────────────────────────────────────────────────");
+        Console.WriteLine("1. Configure suas credenciais do Jira no appsettings.json");
+        Console.WriteLine("2. Configure os membros do seu time");
+        Console.WriteLine("3. Ajuste o JQL padrão conforme sua necessidade");
+        Console.WriteLine("4. Execute o programa e escolha uma opção");
+        Console.WriteLine();
 
-        var panel2 = new Panel(
-            "[blue]BaseUrl:[/] URL completa do seu Jira (ex: http://jira.empresa.com:8080/jira)\n" +
-            "[blue]Username:[/] Seu usuário do Jira\n" +
-            "[blue]Password:[/] Sua senha OU token de API do Jira\n" +
-            "[blue]ProjectKey:[/] Chave do projeto (ex: CROSS, PROJ, etc)\n" +
-            "[blue]DefaultJql:[/] Consulta JQL padrão para buscar issues")
-        {
-            Header = new PanelHeader("⚙️  Configurações Importantes"),
-            Border = BoxBorder.Rounded
-        };
-        AnsiConsole.Write(panel2);
-        AnsiConsole.WriteLine();
+        Console.WriteLine("⚙️  Configurações Importantes");
+        Console.WriteLine("──────────────────────────────────────────────────────────────────");
+        Console.WriteLine("BaseUrl: URL completa do seu Jira (ex: http://jira.empresa.com:8080/jira)");
+        Console.WriteLine("Username: Seu usuário do Jira");
+        Console.WriteLine("Password: Sua senha OU token de API do Jira");
+        Console.WriteLine("ProjectKey: Chave do projeto (ex: CROSS, PROJ, etc)");
+        Console.WriteLine("DefaultJql: Consulta JQL padrão para buscar issues");
+        Console.WriteLine();
 
-        var panel3 = new Panel(
-            "[yellow]customfield_10122:[/] Campo de Story Points (varia por instalação)\n" +
-            "[yellow]customfield_10751:[/] Campo de Sprint (varia por instalação)\n\n" +
-            "[grey]💡 Para descobrir IDs de campos customizados:[/]\n" +
-            "[grey]   GET /rest/api/2/field - lista todos os campos[/]")
-        {
-            Header = new PanelHeader("🔧 Campos Customizados"),
-            Border = BoxBorder.Rounded
-        };
-        AnsiConsole.Write(panel3);
-        AnsiConsole.WriteLine();
+        Console.WriteLine("🔧 Campos Customizados");
+        Console.WriteLine("──────────────────────────────────────────────────────────────────");
+        Console.WriteLine("customfield_10122: Campo de Story Points (varia por instalação)");
+        Console.WriteLine("customfield_10751: Campo de Sprint (varia por instalação)");
+        Console.WriteLine();
+        Console.WriteLine("💡 Para descobrir IDs de campos customizados:");
+        Console.WriteLine("   GET /rest/api/2/field - lista todos os campos");
+        Console.WriteLine();
 
-        var panel4 = new Panel(
-            "[green]1.[/] Após gerar o snapshot, copie os arquivos de [yellow]./output/[/]\n" +
-            "[green]2.[/] Cole na pasta [yellow]data/[/] do seu Dashboard BI\n" +
-            "[green]3.[/] Certifique-se que [blue]snapshots.json[/] foi atualizado\n" +
-            "[green]4.[/] Recarregue o dashboard no navegador (F5)")
-        {
-            Header = new PanelHeader("📊 Usando no Dashboard"),
-            Border = BoxBorder.Rounded
-        };
-        AnsiConsole.Write(panel4);
-        AnsiConsole.WriteLine();
+        Console.WriteLine("📊 Usando no Dashboard");
+        Console.WriteLine("──────────────────────────────────────────────────────────────────");
+        Console.WriteLine("1. Após gerar o snapshot, copie os arquivos de ./output/");
+        Console.WriteLine("2. Cole na pasta data/ do seu Dashboard BI");
+        Console.WriteLine("3. Certifique-se que snapshots.json foi atualizado");
+        Console.WriteLine("4. Recarregue o dashboard no navegador (F5)");
+        Console.WriteLine();
 
-        var panel5 = new Panel(
-            "[yellow]Buscar issues de uma sprint específica:[/]\n" +
-            "[blue]project=CROSS AND sprint=\"Sprint 112\"[/]\n\n" +
-            "[yellow]Buscar por período:[/]\n" +
-            "[blue]project=CROSS AND resolved >= \"2025-01-01\" AND resolved <= \"2025-01-31\"[/]\n\n" +
-            "[yellow]Buscar por tipo e status:[/]\n" +
-            "[blue]project=CROSS AND issuetype=Bug AND status=Done[/]\n\n" +
-            "[yellow]Combinar múltiplos critérios:[/]\n" +
-            "[blue]project=CROSS AND assignee=currentUser() AND status IN (\"In Progress\", Done)[/]")
-        {
-            Header = new PanelHeader("📝 Exemplos de JQL"),
-            Border = BoxBorder.Rounded
-        };
-        AnsiConsole.Write(panel5);
+        Console.WriteLine("📝 Exemplos de JQL");
+        Console.WriteLine("──────────────────────────────────────────────────────────────────");
+        Console.WriteLine("Buscar issues de uma sprint específica:");
+        Console.WriteLine("   project=CROSS AND sprint=\"Sprint 112\"");
+        Console.WriteLine();
+        Console.WriteLine("Buscar por período:");
+        Console.WriteLine("   project=CROSS AND resolved >= \"2025-01-01\" AND resolved <= \"2025-01-31\"");
+        Console.WriteLine();
+        Console.WriteLine("Buscar por tipo e status:");
+        Console.WriteLine("   project=CROSS AND issuetype=Bug AND status=Done");
+        Console.WriteLine();
+        Console.WriteLine("Combinar múltiplos critérios:");
+        Console.WriteLine("   project=CROSS AND assignee=currentUser() AND status IN (\"In Progress\", Done)");
     }
 }
