@@ -44,18 +44,24 @@ export interface Comment {
   createdAt: string;
 }
 
-export interface SprintSnapshot {
+export interface Sprint {
   id: string;
   name: string;
   startDate: string;
   endDate: string;
   goal: string;
+  metadata: {
+    source: string;
+    generatedAt: string;
+    totalIssues: number;
+    jiraProject: string;
+  };
+}
+
+export interface SprintSnapshot {
+  sprint: Sprint;
   tasks: Task[];
   team: TeamMember[];
-  metadata: {
-    capturedAt: string;
-    version: string;
-  };
 }
 
 export interface TeamMember {

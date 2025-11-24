@@ -98,7 +98,7 @@ export default function Dashboard() {
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save(`sprint-report-${dashboardData.snapshot.name}-${new Date().toISOString().split('T')[0]}.pdf`);
+      pdf.save(`sprint-report-${dashboardData.snapshot.sprint.name}-${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Erro ao gerar relatório PDF');
@@ -156,12 +156,12 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">{snapshot.name}</h1>
-              <p className="text-gray-300 text-lg">{snapshot.goal}</p>
+              <h1 className="text-4xl font-bold text-white mb-2">{snapshot.sprint.name}</h1>
+              <p className="text-gray-300 text-lg">{snapshot.sprint.goal}</p>
               <div className="flex gap-4 mt-3 text-sm text-gray-400">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  {new Date(snapshot.startDate).toLocaleDateString('pt-BR')} - {new Date(snapshot.endDate).toLocaleDateString('pt-BR')}
+                  {new Date(snapshot.sprint.startDate).toLocaleDateString('pt-BR')} - {new Date(snapshot.sprint.endDate).toLocaleDateString('pt-BR')}
                 </span>
                 <span className="flex items-center gap-1">
                   <Users className="w-4 h-4" />

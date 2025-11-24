@@ -261,7 +261,7 @@ export class SprintAnalytics {
       dailyCompletion,
       statusDistribution,
       burndown,
-      velocity: [{ sprint: this.snapshot.name, points: completedTasks.reduce((s, t) => s + t.points, 0) }]
+      velocity: [{ sprint: this.snapshot.sprint.name, points: completedTasks.reduce((s, t) => s + t.points, 0) }]
     };
   }
 
@@ -285,8 +285,8 @@ export class SprintAnalytics {
   }
 
   private calculateBurndown(): Array<{ date: string; remaining: number; ideal: number }> {
-    const startDate = parseISO(this.snapshot.startDate);
-    const endDate = parseISO(this.snapshot.endDate);
+    const startDate = parseISO(this.snapshot.sprint.startDate);
+    const endDate = parseISO(this.snapshot.sprint.endDate);
     const totalPoints = this.snapshot.tasks.reduce((sum, t) => sum + t.points, 0);
     const totalDays = differenceInDays(endDate, startDate);
     const idealBurnRate = totalPoints / totalDays;
