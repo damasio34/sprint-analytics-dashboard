@@ -36,5 +36,5 @@ lerna-debug.log*
 Thumbs.db
 
 # Data (uncomment if you don't want to commit snapshots)
-# data/*.json
+ data/*.json
 # !data/snapshots.json
