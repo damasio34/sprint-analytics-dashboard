@@ -66,7 +66,6 @@ export class SprintAnalytics {
     const timeByPoints: SprintMetrics['timeByPoints'] = {};
     completedTasks.forEach(task => {
       if (task.startedAt && task.completedAt) {
-        const time = differenceInHours(parseISO(task.completedAt), parseISO(task.startedAt));
         if (!timeByPoints[task.points]) {
           timeByPoints[task.points] = { averageTime: 0, count: 0, tasks: [] };
         }
@@ -310,14 +309,14 @@ export class SprintAnalytics {
     return result;
   }
 
-  private calculateStatusDistribution(): Array<{ date: string; [status: string]: number }> {
+  private calculateStatusDistribution(): Array<{ date: string; [status: string]: string | number }> {
     // Simplified - would need historical data for accurate distribution
-    const current: any = {
+    const current: { date: string; [key: string]: string | number } = {
       date: new Date().toISOString().split('T')[0]
     };
 
     this.snapshot.tasks.forEach(task => {
-      current[task.status] = (current[task.status] || 0) + 1;
+      current[task.status] = (current[task.status] as number || 0) + 1;
     });
 
     return [current];

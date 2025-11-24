@@ -1,16 +1,16 @@
 // DashboardComponents.tsx - Team and Insights Views
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   BarChart, Bar, LineChart, Line, RadarChart, Radar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 import {
-  User, TrendingUp, TrendingDown, AlertTriangle, CheckCircle,
-  Clock, Target, Award, AlertCircle, Info, Zap
+  User, TrendingUp, AlertTriangle, CheckCircle,
+  Target, Award, AlertCircle, Info, Zap
 } from 'lucide-react';
-import { DashboardData, MemberMetrics, Insight } from './types';
+import { DashboardData, Insight } from './types';
 
 export function TeamView({ data }: { data: DashboardData }) {
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
@@ -425,7 +425,7 @@ function MetricBox({ label, value, icon, color }: any) {
 
   return (
     <div className="bg-gray-50 rounded-lg p-4">
-      <div className={`${colorClasses[color]} mb-2`}>{icon}</div>
+      <div className={`${colorClasses[color as keyof typeof colorClasses]} mb-2`}>{icon}</div>
       <div className="text-2xl font-bold text-gray-800">{value}</div>
       <div className="text-sm text-gray-600">{label}</div>
     </div>

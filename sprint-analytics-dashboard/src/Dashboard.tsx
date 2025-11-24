@@ -1,20 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  AreaChart, Area
+import { useState, useEffect, lazy, Suspense } from 'react';
+import {
+  BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import {
-  TrendingUp, TrendingDown, AlertTriangle, CheckCircle,
+  TrendingUp, TrendingDown, AlertTriangle,
   Clock, Users, Target, Activity, Download, Upload,
   Calendar, Award, Zap, AlertCircle
 } from 'lucide-react';
 import { SprintAnalytics } from './analytics';
 import { DashboardData, SprintSnapshot } from './types';
-import { TeamView, InsightsView } from './DashboardComponents';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+
+// Lazy load components
+const TeamView = lazy(() => import('./DashboardComponents').then(module => ({ default: module.TeamView })));
+const InsightsView = lazy(() => import('./DashboardComponents').then(module => ({ default: module.InsightsView })));
+
+// Lazy load PDF libraries
+const loadPDFLibraries = async () => {
+  const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+    import('html2canvas'),
+    import('jspdf')
+  ]);
+  return { html2canvas, jsPDF };
+};
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 const STATUS_COLORS: { [key: string]: string } = {
@@ -29,9 +37,7 @@ const STATUS_COLORS: { [key: string]: string } = {
 
 export default function Dashboard() {
   const [snapshots, setSnapshots] = useState<string[]>([]);
-  const [selectedSnapshot, setSelectedSnapshot] = useState<string>('');
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(false);
   const [view, setView] = useState<'overview' | 'team' | 'insights'>('overview');
 
   useEffect(() => {
@@ -57,21 +63,17 @@ export default function Dashboard() {
   };
 
   const loadSnapshot = async (filename: string) => {
-    setLoading(true);
     try {
       const response = await fetch(`/data/${filename}`);
       const snapshot: SprintSnapshot = await response.json();
-      
+
       const analytics = new SprintAnalytics(snapshot);
       const data = analytics.analyze();
-      
+
       setDashboardData(data);
-      setSelectedSnapshot(filename);
     } catch (error) {
       console.error('Error loading snapshot:', error);
       alert('Erro ao carregar o snapshot. Verifique se o arquivo existe.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -81,19 +83,26 @@ export default function Dashboard() {
     const element = document.getElementById('dashboard-content');
     if (!element) return;
 
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      logging: false,
-      useCORS: true
-    });
+    try {
+      const { html2canvas, jsPDF } = await loadPDFLibraries();
 
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-    pdf.save(`sprint-report-${dashboardData.snapshot.name}-${new Date().toISOString().split('T')[0]}.pdf`);
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        logging: false,
+        useCORS: true
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(`sprint-report-${dashboardData.snapshot.name}-${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Erro ao gerar relatório PDF');
+    }
   };
 
   if (!dashboardData) {
@@ -163,7 +172,7 @@ export default function Dashboard() {
             
             <div className="flex gap-3">
               <button
-                onClick={() => setSelectedSnapshot('')}
+                onClick={() => setDashboardData(null)}
                 className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition"
               >
                 <Upload className="w-5 h-5" />
@@ -243,8 +252,16 @@ export default function Dashboard() {
         </div>
 
         {view === 'overview' && <OverviewView data={dashboardData} />}
-        {view === 'team' && <TeamView data={dashboardData} />}
-        {view === 'insights' && <InsightsView data={dashboardData} />}
+        {view === 'team' && (
+          <Suspense fallback={<div className="text-center py-8 text-white">Carregando visualização do time...</div>}>
+            <TeamView data={dashboardData} />
+          </Suspense>
+        )}
+        {view === 'insights' && (
+          <Suspense fallback={<div className="text-center py-8 text-white">Carregando insights...</div>}>
+            <InsightsView data={dashboardData} />
+          </Suspense>
+        )}
       </div>
     </div>
   );
@@ -260,7 +277,7 @@ function KPICard({ title, value, subtitle, icon, trend, color }: any) {
   };
 
   return (
-    <div className={`bg-gradient-to-br ${colorClasses[color]} rounded-xl shadow-lg p-6 text-white`}>
+    <div className={`bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses]} rounded-xl shadow-lg p-6 text-white`}>
       <div className="flex justify-between items-start mb-4">
         <div className="opacity-90">{icon}</div>
         {trend && (
@@ -381,7 +398,7 @@ function OverviewView({ data }: { data: DashboardData }) {
                 fill="#8884d8"
                 dataKey="value"
               >
-                {typeData.map((entry, index) => (
+                {typeData.map((_entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

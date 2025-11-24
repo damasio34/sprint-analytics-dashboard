@@ -163,7 +163,7 @@ export interface Insight {
 
 export interface TrendData {
   dailyCompletion: Array<{ date: string; completed: number; points: number }>;
-  statusDistribution: Array<{ date: string; [status: string]: number }>;
+  statusDistribution: Array<{ date: string; [status: string]: string | number }>;
   burndown: Array<{ date: string; remaining: number; ideal: number }>;
   velocity: Array<{ sprint: string; points: number }>;
 }
