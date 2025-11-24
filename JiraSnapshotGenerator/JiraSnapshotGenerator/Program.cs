@@ -11,9 +11,16 @@ class Program
     {
         // Configurar Serilog
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .WriteTo.Console()
-            .WriteTo.File("logs/jira-snapshot-.txt", rollingInterval: RollingInterval.Day)
+            .MinimumLevel.Debug()
+            .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+            .WriteTo.File("logs/jira-snapshot-.txt",
+                rollingInterval: RollingInterval.Day,
+                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug)
+            .WriteTo.File("logs/jira-requests-.txt",
+                rollingInterval: RollingInterval.Day,
+                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+            .Enrich.FromLogContext()
             .CreateLogger();
 
         try
