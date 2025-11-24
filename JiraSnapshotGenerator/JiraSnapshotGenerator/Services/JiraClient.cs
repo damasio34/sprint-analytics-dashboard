@@ -68,7 +68,8 @@ public class JiraClient
     public async Task<JiraSearchResponse> SearchIssuesAsync(string jql, int startAt = 0, int maxResults = 50)
     {
         var fields = "summary,description,issuetype,status,priority,assignee,creator,created,updated,resolutiondate,customfield_10122,customfield_10751";
-        var url = $"/rest/api/2/search?jql={jql}&fields={fields}&startAt={startAt}&maxResults={maxResults}";
+        var encodedJql = Uri.EscapeDataString(jql);
+        var url = $"/rest/api/2/search?jql={encodedJql}&fields={fields}&startAt={startAt}&maxResults={maxResults}";
 
         var stopwatch = Stopwatch.StartNew();
         var fullUrl = _httpClient.BaseAddress + url.TrimStart('/');
@@ -80,7 +81,7 @@ public class JiraClient
 
         try
         {
-            var response = await _httpClient.GetAsync(url);
+            var response = await _httpClient.GetAsync(url.TrimStart('/'));
             stopwatch.Stop();
 
             Log.Debug("[HTTP] Resposta recebida em {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
@@ -152,7 +153,7 @@ public class JiraClient
 
         try
         {
-            var response = await _httpClient.GetAsync(url);
+            var response = await _httpClient.GetAsync(url.TrimStart('/'));
             stopwatch.Stop();
 
             Log.Debug("[HTTP] Issue {IssueKey} - Resposta em {ElapsedMs}ms - Status: {StatusCode}",
