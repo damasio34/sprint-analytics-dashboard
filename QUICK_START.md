@@ -1,209 +1,215 @@
-# 🚀 Guia Rápido - Sprint Analytics Dashboard
+# 🚀 Quick Start - Corporate Framework
 
-## Início em 3 Passos
+## Conteúdo do Pacote
 
-### 1️⃣ Instalar Docker
+Este ZIP contém um **Framework Corporativo completo** implementado em .NET 8 com:
 
-#### Windows/Mac
-Baixe e instale o Docker Desktop:
-https://www.docker.com/products/docker-desktop
+✅ **Clean Architecture** + **DDD** + **CQRS**  
+✅ **Exemplo funcional** de domínio (Orders/Pedidos)  
+✅ **Testes automatizados** com xUnit  
+✅ **Documentação completa** e guias de uso  
+✅ **Postman Collection** para testes da API  
 
-#### Linux (Ubuntu/Debian)
+## 📋 Pré-requisitos
+
+- **.NET 8.0 SDK** ([Download](https://dotnet.microsoft.com/download/dotnet/8.0))
+- **Visual Studio 2022** ou **VS Code** (opcional)
+- **Postman** (opcional, para testes)
+
+## ⚡ Início Rápido (3 passos)
+
+### 1. Extrair e Restaurar
+
 ```bash
-sudo apt-get update
-sudo apt-get install docker.io docker-compose
-sudo usermod -aG docker $USER
-# Faça logout e login novamente
+# Extrair o ZIP
+unzip corporate-framework.zip
+cd corporate-framework
+
+# Restaurar pacotes NuGet
+dotnet restore
 ```
 
-### 2️⃣ Executar o Dashboard
+### 2. Compilar
 
-#### Linux/Mac
 ```bash
-./start.sh
+# Compilar toda a solução
+dotnet build
 ```
 
-#### Windows
-```cmd
-start.bat
+### 3. Executar
+
+```bash
+# Navegar para a API
+cd src/CorporateFramework.API
+
+# Executar a aplicação
+dotnet run
+
+# A API estará disponível em: https://localhost:5001
+# Swagger (documentação interativa): https://localhost:5001
 ```
 
-Ou clique duas vezes no arquivo `start.bat`
+## 🧪 Executar Testes
 
-### 3️⃣ Acessar
-
-Abra seu navegador em:
-```
-http://localhost:3000
+```bash
+# Na raiz do projeto
+dotnet test
 ```
 
----
-
-## 📊 Como Usar
-
-### Carregar um Snapshot
-
-1. Na tela inicial, você verá os snapshots disponíveis
-2. Clique em um snapshot para carregar (ex: `sprint-2024-01`)
-3. O dashboard será carregado com todos os dados e análises
-
-### Navegar entre Abas
-
-O dashboard possui 3 abas principais:
-
-#### 🎯 Visão Geral
-- Métricas gerais da sprint
-- Gráficos de distribuição
-- Análise de tempo por pontuação
-- Métricas de qualidade
-
-#### 👥 Time
-- Clique em um membro para ver detalhes
-- Compare performance entre membros
-- Veja radar de performance individual
-- Analise tendências de conclusão
-
-#### 💡 Insights
-- Veja insights automáticos gerados
-- Identifique problemas críticos
-- Receba recomendações de melhoria
-- Planeje próximos passos
-
-### Exportar Relatório
-
-1. Navegue pela aba desejada
-2. Clique em "Exportar Relatório" (botão verde no topo)
-3. Um PDF será gerado com snapshot do dashboard
-
----
-
-## 📁 Adicionar Seus Snapshots
-
-### Passo 1: Crie o Arquivo JSON
-
-Crie um arquivo na pasta `data/` com seus dados:
+## 📚 Estrutura do Projeto
 
 ```
-data/minha-sprint.json
+corporate-framework/
+├── README.md                           ← Documentação principal
+├── ARCHITECTURE.md                     ← Detalhes da arquitetura
+├── USAGE_GUIDE.md                      ← Guia de uso completo
+├── CorporateFramework.postman_collection.json  ← Collection do Postman
+├── CorporateFramework.sln              ← Solução Visual Studio
+├── src/
+│   ├── CorporateFramework.Domain/      ← Camada de Domínio (Core)
+│   ├── CorporateFramework.Application/ ← Camada de Aplicação (Use Cases)
+│   ├── CorporateFramework.Infrastructure/ ← Infraestrutura
+│   └── CorporateFramework.API/         ← API REST
+└── tests/
+    └── CorporateFramework.Tests/       ← Testes automatizados
 ```
 
-Use o formato do arquivo `sprint-2024-01.json` como exemplo.
+## 🎯 Testando a API
 
-### Passo 2: Atualize a Lista
+### Opção 1: Via Swagger
+1. Abra https://localhost:5001 no navegador
+2. Use a interface interativa do Swagger para testar os endpoints
 
-Edite o arquivo `data/snapshots.json` e adicione seu arquivo:
+### Opção 2: Via Postman
+1. Importe o arquivo `CorporateFramework.postman_collection.json`
+2. Configure a variável `baseUrl` para `https://localhost:5001`
+3. Execute as requisições da collection
+
+### Opção 3: Via cURL
+
+```bash
+# Criar um pedido
+curl -X POST https://localhost:5001/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "items": [
+      {
+        "productId": "3fa85f64-5717-4562-b3fc-2c963f66afa7",
+        "productName": "Notebook Dell",
+        "unitPrice": 3500.00,
+        "currency": "BRL",
+        "quantity": 2
+      }
+    ],
+    "createdBy": "user@example.com"
+  }' | jq
+
+# Listar todos os pedidos
+curl https://localhost:5001/api/orders | jq
+```
+
+## 📖 Documentação
+
+### 1. **README.md**
+Documentação principal com visão geral do framework
+
+### 2. **ARCHITECTURE.md**
+Explicação detalhada da arquitetura, padrões e princípios
+
+### 3. **USAGE_GUIDE.md**
+Guia passo-a-passo de como usar e estender o framework
+
+## 🎓 Principais Conceitos Implementados
+
+### Clean Architecture
+- Separação em camadas com dependências bem definidas
+- Domínio no centro, independente de frameworks
+
+### Domain-Driven Design (DDD)
+- **Entities:** Classes com identidade única
+- **Value Objects:** Objetos imutáveis comparados por valor (Money, Email)
+- **Aggregates:** Order como agregado raiz
+- **Domain Events:** Comunicação entre agregados
+- **Repositories:** Abstração de persistência
+
+### CQRS Pattern
+- **Commands:** Operações de escrita (Create, Update, Delete)
+- **Queries:** Operações de leitura (Get, List, Search)
+- Handlers separados para cada responsabilidade
+
+### Padrões de Projeto
+- Repository Pattern
+- Unit of Work Pattern
+- Mediator Pattern (MediatR)
+- Factory Pattern
+- Strategy Pattern (validadores)
+
+### Princípios SOLID
+- **S**ingle Responsibility
+- **O**pen/Closed
+- **L**iskov Substitution
+- **I**nterface Segregation
+- **D**ependency Inversion
+
+## 🔧 Configuração
+
+O projeto usa **InMemory Database** por padrão, não requer configuração adicional.
+
+Para usar SQL Server, edite `appsettings.json`:
 
 ```json
 {
-  "snapshots": [
-    "sprint-2024-01.json",
-    "minha-sprint.json"
-  ]
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=.;Database=CorporateFrameworkDb;Trusted_Connection=true;"
+  }
 }
 ```
 
-### Passo 3: Recarregue a Página
+E atualize `Program.cs`:
 
-Atualize o navegador (F5) e seu novo snapshot aparecerá na lista!
-
----
-
-## 🔍 Principais Métricas Explicadas
-
-### Cycle Time
-Tempo desde quando a tarefa foi **iniciada** até ser **completada**.
-- Mede a eficiência da execução
-- Ideal: < 3 dias para tarefas de 3 pontos
-
-### Lead Time
-Tempo desde quando a tarefa foi **criada** até ser **completada**.
-- Mede o tempo total no sistema
-- Inclui tempo de espera
-
-### Velocidade
-Total de pontos completados na sprint.
-- Indica capacidade de entrega
-- Use para planejar próximas sprints
-
-### Taxa de Retrabalho
-% de tarefas que voltaram para status anterior.
-- Indica problemas de qualidade
-- Ideal: < 10%
-
-### Utilização
-Carga atual vs capacidade do membro.
-- 100% = utilizando toda capacidade
-- > 120% = sobrecarregado
-
----
-
-## 🎯 Dicas de Uso
-
-### Para Scrum Masters
-1. **Daily**: Verifique tarefas bloqueadas e membros sobrecarregados
-2. **Mid-sprint**: Analise se o compromisso será atingido
-3. **Retrospectiva**: Use insights para guiar discussões
-
-### Para Product Owners
-1. Verifique a velocidade para planejar próximas sprints
-2. Analise o tempo por pontuação para melhorar estimativas
-3. Use o compromisso vs entrega para ajustar scope
-
-### Para Gestores
-1. Compare performance entre sprints
-2. Identifique necessidades de treinamento
-3. Gere relatórios PDF para stakeholders
-
----
-
-## ⚙️ Comandos Úteis
-
-### Ver Logs
-```bash
-docker-compose logs -f
+```csharp
+// Trocar UseInMemoryDatabase por UseSqlServer
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 ```
 
-### Parar Dashboard
+## 🆘 Solução de Problemas
+
+### Erro: "Unable to bind to https://localhost:5001"
+**Solução:** A porta pode estar em uso. Altere em `launchSettings.json` ou execute:
 ```bash
-docker-compose down
+dotnet run --urls "http://localhost:5050"
 ```
 
-### Reiniciar Dashboard
+### Erro: "The type or namespace name 'MediatR' could not be found"
+**Solução:** Restaure os pacotes NuGet:
 ```bash
-docker-compose restart
+dotnet restore
 ```
 
-### Rebuild (após mudanças)
+### Erro ao executar testes
+**Solução:** Compile o projeto primeiro:
 ```bash
-docker-compose down
-docker-compose build
-docker-compose up -d
+dotnet build
+dotnet test
 ```
+
+## 📞 Suporte e Mais Informações
+
+- **Documentação completa:** Consulte `README.md`
+- **Arquitetura detalhada:** Consulte `ARCHITECTURE.md`
+- **Guia de uso:** Consulte `USAGE_GUIDE.md`
+- **Exemplos de código:** Explore os arquivos no diretório `src/`
+
+## 🎯 Próximos Passos
+
+1. ✅ Execute o projeto e explore o Swagger
+2. ✅ Rode os testes para entender o comportamento
+3. ✅ Leia o `USAGE_GUIDE.md` para aprender a estender
+4. ✅ Implemente seu próprio domínio seguindo os exemplos
+5. ✅ Adapte o framework às necessidades da sua empresa
 
 ---
 
-## ❓ Problemas Comuns
-
-### "Docker não encontrado"
-**Solução**: Instale o Docker Desktop ou docker.io
-
-### "Porta 3000 em uso"
-**Solução**: Pare o serviço que está usando a porta ou edite `docker-compose.yml` para usar outra porta
-
-### "Snapshot não carrega"
-**Solução**: Verifique se o JSON está válido em https://jsonlint.com
-
-### "Página em branco"
-**Solução**: 
-1. Verifique os logs: `docker-compose logs`
-2. Reinicie: `docker-compose restart`
-
----
-
-## 📞 Suporte
-
-Para mais ajuda, consulte o README.md completo ou abra uma issue no repositório.
-
----
-
-**Pronto para começar? Execute `./start.sh` (Linux/Mac) ou `start.bat` (Windows)!** 🚀
+**Desenvolvido com ❤️ seguindo as melhores práticas de engenharia de software**

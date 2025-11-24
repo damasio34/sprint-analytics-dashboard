@@ -1,0 +1,49 @@
+# Build results
+bin/
+obj/
+output/
+
+# User-specific files
+*.user
+*.suo
+*.userprefs
+*.sln.docstates
+
+# Visual Studio
+.vs/
+*.vspscc
+*.vssscc
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Output directories
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+bld/
+
+# NuGet Packages
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# Sensitive data
+appsettings.*.json
+!appsettings.json
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
