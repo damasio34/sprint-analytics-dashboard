@@ -7,7 +7,7 @@ echo "================================"
 echo ""
 
 # Check if Docker is installed
-if ! command -v docker &> /dev/null; then
+if ! command -v sudo docker &> /dev/null; then
     echo "❌ Docker não está instalado!"
     echo ""
     echo "Por favor, instale o Docker:"
@@ -17,10 +17,10 @@ if ! command -v docker &> /dev/null; then
 fi
 
 # Check if docker-compose is available
-if command -v docker-compose &> /dev/null; then
-    COMPOSE_CMD="docker-compose"
-elif docker compose version &> /dev/null; then
-    COMPOSE_CMD="docker compose"
+if command -v sudo docker-compose &> /dev/null; then
+    COMPOSE_CMD="sudo docker-compose"
+elif sudo docker compose version &> /dev/null; then
+    COMPOSE_CMD="sudo docker compose"
 else
     echo "❌ docker-compose não está disponível!"
     exit 1
