@@ -1,0 +1,430 @@
+{
+  "id": "sprint-2024-01",
+  "name": "Sprint 01/2024 - Q1",
+  "startDate": "2024-01-08T00:00:00Z",
+  "endDate": "2024-01-22T00:00:00Z",
+  "goal": "Implementar funcionalidades de autenticação e dashboard inicial",
+  "metadata": {
+    "capturedAt": "2024-01-22T18:00:00Z",
+    "version": "1.0"
+  },
+  "team": [
+    {
+      "id": "dev-001",
+      "name": "João Silva",
+      "email": "joao.silva@empresa.com",
+      "role": "Senior Developer",
+      "capacity": 40
+    },
+    {
+      "id": "dev-002",
+      "name": "Maria Santos",
+      "email": "maria.santos@empresa.com",
+      "role": "Full Stack Developer",
+      "capacity": 40
+    },
+    {
+      "id": "dev-003",
+      "name": "Pedro Oliveira",
+      "email": "pedro.oliveira@empresa.com",
+      "role": "Frontend Developer",
+      "capacity": 35
+    },
+    {
+      "id": "dev-004",
+      "name": "Ana Costa",
+      "email": "ana.costa@empresa.com",
+      "role": "Backend Developer",
+      "capacity": 40
+    }
+  ],
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Implementar sistema de login JWT",
+      "description": "Desenvolver autenticação completa com JWT tokens",
+      "assignee": "João Silva",
+      "points": 5,
+      "status": "done",
+      "priority": "high",
+      "type": "feature",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "startedAt": "2024-01-08T14:00:00Z",
+      "completedAt": "2024-01-12T16:30:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["authentication", "security"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        },
+        {
+          "from": "todo",
+          "to": "in_progress",
+          "changedAt": "2024-01-08T14:00:00Z",
+          "changedBy": "João Silva",
+          "duration": 5
+        },
+        {
+          "from": "in_progress",
+          "to": "in_review",
+          "changedAt": "2024-01-11T11:00:00Z",
+          "changedBy": "João Silva",
+          "duration": 69
+        },
+        {
+          "from": "in_review",
+          "to": "in_progress",
+          "changedAt": "2024-01-11T15:00:00Z",
+          "changedBy": "Reviewer",
+          "duration": 4
+        },
+        {
+          "from": "in_progress",
+          "to": "in_review",
+          "changedAt": "2024-01-12T10:00:00Z",
+          "changedBy": "João Silva",
+          "duration": 19
+        },
+        {
+          "from": "in_review",
+          "to": "done",
+          "changedAt": "2024-01-12T16:30:00Z",
+          "changedBy": "Reviewer",
+          "duration": 6.5
+        }
+      ]
+    },
+    {
+      "id": "TASK-002",
+      "title": "Criar componente de Dashboard",
+      "description": "Desenvolver layout principal do dashboard",
+      "assignee": "Pedro Oliveira",
+      "points": 3,
+      "status": "done",
+      "priority": "high",
+      "type": "feature",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "startedAt": "2024-01-09T09:00:00Z",
+      "completedAt": "2024-01-11T17:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["frontend", "ui"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        },
+        {
+          "from": "todo",
+          "to": "in_progress",
+          "changedAt": "2024-01-09T09:00:00Z",
+          "changedBy": "Pedro Oliveira",
+          "duration": 24
+        },
+        {
+          "from": "in_progress",
+          "to": "in_review",
+          "changedAt": "2024-01-11T15:00:00Z",
+          "changedBy": "Pedro Oliveira",
+          "duration": 54
+        },
+        {
+          "from": "in_review",
+          "to": "done",
+          "changedAt": "2024-01-11T17:00:00Z",
+          "changedBy": "Reviewer",
+          "duration": 2
+        }
+      ]
+    },
+    {
+      "id": "TASK-003",
+      "title": "Configurar banco de dados PostgreSQL",
+      "description": "Setup inicial do banco e migrations",
+      "assignee": "Ana Costa",
+      "points": 3,
+      "status": "done",
+      "priority": "high",
+      "type": "technical_debt",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "startedAt": "2024-01-08T10:00:00Z",
+      "completedAt": "2024-01-09T16:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["database", "setup"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        },
+        {
+          "from": "todo",
+          "to": "in_progress",
+          "changedAt": "2024-01-08T10:00:00Z",
+          "changedBy": "Ana Costa",
+          "duration": 1
+        },
+        {
+          "from": "in_progress",
+          "to": "done",
+          "changedAt": "2024-01-09T16:00:00Z",
+          "changedBy": "Ana Costa",
+          "duration": 30
+        }
+      ]
+    },
+    {
+      "id": "TASK-004",
+      "title": "Implementar API de usuários",
+      "description": "CRUD completo de usuários",
+      "assignee": "Maria Santos",
+      "points": 5,
+      "status": "done",
+      "priority": "high",
+      "type": "feature",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "startedAt": "2024-01-10T09:00:00Z",
+      "completedAt": "2024-01-16T18:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["api", "backend"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        },
+        {
+          "from": "todo",
+          "to": "in_progress",
+          "changedAt": "2024-01-10T09:00:00Z",
+          "changedBy": "Maria Santos",
+          "duration": 48
+        },
+        {
+          "from": "in_progress",
+          "to": "blocked",
+          "changedAt": "2024-01-12T14:00:00Z",
+          "changedBy": "Maria Santos",
+          "duration": 53
+        },
+        {
+          "from": "blocked",
+          "to": "in_progress",
+          "changedAt": "2024-01-15T09:00:00Z",
+          "changedBy": "Maria Santos",
+          "duration": 67
+        },
+        {
+          "from": "in_progress",
+          "to": "in_review",
+          "changedAt": "2024-01-16T15:00:00Z",
+          "changedBy": "Maria Santos",
+          "duration": 30
+        },
+        {
+          "from": "in_review",
+          "to": "done",
+          "changedAt": "2024-01-16T18:00:00Z",
+          "changedBy": "Reviewer",
+          "duration": 3
+        }
+      ]
+    },
+    {
+      "id": "TASK-005",
+      "title": "Corrigir bug de validação de formulário",
+      "description": "Formulário não valida email corretamente",
+      "assignee": "Pedro Oliveira",
+      "points": 2,
+      "status": "done",
+      "priority": "urgent",
+      "type": "bug",
+      "createdAt": "2024-01-12T11:00:00Z",
+      "startedAt": "2024-01-12T11:30:00Z",
+      "completedAt": "2024-01-12T15:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["bug", "frontend"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-12T11:00:00Z",
+          "changedBy": "QA",
+          "duration": 0
+        },
+        {
+          "from": "todo",
+          "to": "in_progress",
+          "changedAt": "2024-01-12T11:30:00Z",
+          "changedBy": "Pedro Oliveira",
+          "duration": 0.5
+        },
+        {
+          "from": "in_progress",
+          "to": "done",
+          "changedAt": "2024-01-12T15:00:00Z",
+          "changedBy": "Pedro Oliveira",
+          "duration": 3.5
+        }
+      ]
+    },
+    {
+      "id": "TASK-006",
+      "title": "Implementar sistema de notificações",
+      "description": "Push notifications e email alerts",
+      "assignee": "João Silva",
+      "points": 8,
+      "status": "in_progress",
+      "priority": "medium",
+      "type": "feature",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "startedAt": "2024-01-15T09:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["notifications", "feature"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        },
+        {
+          "from": "todo",
+          "to": "in_progress",
+          "changedAt": "2024-01-15T09:00:00Z",
+          "changedBy": "João Silva",
+          "duration": 168
+        }
+      ]
+    },
+    {
+      "id": "TASK-007",
+      "title": "Melhorar performance de queries",
+      "description": "Otimizar consultas ao banco de dados",
+      "assignee": "Ana Costa",
+      "points": 3,
+      "status": "in_review",
+      "priority": "medium",
+      "type": "improvement",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "startedAt": "2024-01-17T09:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["performance", "backend"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        },
+        {
+          "from": "todo",
+          "to": "in_progress",
+          "changedAt": "2024-01-17T09:00:00Z",
+          "changedBy": "Ana Costa",
+          "duration": 216
+        },
+        {
+          "from": "in_progress",
+          "to": "in_review",
+          "changedAt": "2024-01-19T16:00:00Z",
+          "changedBy": "Ana Costa",
+          "duration": 55
+        }
+      ]
+    },
+    {
+      "id": "TASK-008",
+      "title": "Criar testes unitários para autenticação",
+      "description": "Cobertura de testes para módulo de auth",
+      "assignee": "Maria Santos",
+      "points": 3,
+      "status": "todo",
+      "priority": "medium",
+      "type": "technical_debt",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["tests", "quality"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "id": "TASK-009",
+      "title": "Documentar API com Swagger",
+      "description": "Adicionar documentação completa da API",
+      "assignee": "Maria Santos",
+      "points": 2,
+      "status": "todo",
+      "priority": "low",
+      "type": "technical_debt",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["documentation"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        }
+      ]
+    },
+    {
+      "id": "TASK-010",
+      "title": "Implementar recuperação de senha",
+      "description": "Fluxo completo de reset de senha",
+      "assignee": "Pedro Oliveira",
+      "points": 5,
+      "status": "blocked",
+      "priority": "medium",
+      "type": "feature",
+      "createdAt": "2024-01-08T09:00:00Z",
+      "startedAt": "2024-01-18T09:00:00Z",
+      "sprint": "Sprint 01/2024",
+      "labels": ["authentication", "feature"],
+      "statusHistory": [
+        {
+          "from": "backlog",
+          "to": "todo",
+          "changedAt": "2024-01-08T09:00:00Z",
+          "changedBy": "Scrum Master",
+          "duration": 0
+        },
+        {
+          "from": "todo",
+          "to": "in_progress",
+          "changedAt": "2024-01-18T09:00:00Z",
+          "changedBy": "Pedro Oliveira",
+          "duration": 240
+        },
+        {
+          "from": "in_progress",
+          "to": "blocked",
+          "changedAt": "2024-01-19T14:00:00Z",
+          "changedBy": "Pedro Oliveira",
+          "duration": 29
+        }
+      ]
+    }
+  ]
+}
